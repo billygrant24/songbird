@@ -67,8 +67,12 @@ class App extends Container
 
     public function registerMiddleware()
     {
-        foreach ($this->get('Config')->get('middleware') as $middleware) {
-            $this->get($middleware)->register();
+        $middleware = $this->get('Config')['middleware'];
+
+        if (is_array($middleware)) {
+            foreach ($middleware as $service) {
+                $this->get($service)->register();
+            }
         }
     }
 
