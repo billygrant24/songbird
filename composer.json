@@ -21,5 +21,10 @@
         "monolog/monolog": "~1.12",
         "noodlehaus/config": "0.7.*",
         "symfony/debug": "~2.6"
-    }
+    },
+    "autoload": {
+        "psr-4": {
+            "Songbird\\": "src/"
+        }
+    },
 }
