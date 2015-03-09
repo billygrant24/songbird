@@ -8,10 +8,8 @@ use League\Flysystem\Cached\Storage\Memory as CacheStore;
 use Songbird\ConfigAwareInterface;
 use Songbird\ConfigAwareTrait;
 
-class FilesystemServiceProvider extends ServiceProvider implements ConfigAwareInterface
+class FilesystemServiceProvider extends ServiceProvider
 {
-    use ConfigAwareTrait;
-
     /**
      * This array allows the container to be aware of
      * what your service provider actually provides,
@@ -33,7 +31,7 @@ class FilesystemServiceProvider extends ServiceProvider implements ConfigAwareIn
     public function register()
     {
         $app = $this->getContainer();
-        $config = $this->getConfig();
+        $config = $this->getContainer()->get('Config');
 
         $localAdapter = new Adapter($config->get('app.paths.resources'));
         $cacheStore = new CacheStore();

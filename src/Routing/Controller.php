@@ -5,6 +5,7 @@ use JamesMoss\Flywheel\DocumentInterface;
 use League\Container\ContainerAwareInterface;
 use League\Container\ContainerAwareTrait;
 use League\Container\Exception\ReflectionException;
+use Songbird\Event\EventAwareTrait;
 use Songbird\Logger\LoggerAwareInterface;
 use Songbird\Logger\LoggerAwareTrait;
 use Symfony\Component\HttpFoundation\Request;
@@ -12,7 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class Controller implements ContainerAwareInterface, LoggerAwareInterface
 {
-    use ContainerAwareTrait, LoggerAwareTrait;
+    use ContainerAwareTrait, LoggerAwareTrait, EventAwareTrait;
 
     /**
      * @param \Symfony\Component\HttpFoundation\Request  $request
@@ -25,6 +26,7 @@ class Controller implements ContainerAwareInterface, LoggerAwareInterface
     public function handle(Request $request, Response $response, array $args)
     {
         $slug = $args['slug'] ? $args['slug'] : 'home';
+
         $repo = $this->getContainer()->get('App.Repo.Documents');
         if (!$document = $repo->findById($slug)) {
             $document = $repo->findById('404');
@@ -80,10 +82,10 @@ class Controller implements ContainerAwareInterface, LoggerAwareInterface
         }
 
         foreach ($listeners as $listener) {
-            $this->getContainer()->addListener($listener,
+            $this->addListener($listener,
                 $this->getContainer()->resolve($listener, [$request, $response, $args]));
 
-            $this->getContainer()->emit($listener);
+            $this->emit($listener);
         }
     }
 }

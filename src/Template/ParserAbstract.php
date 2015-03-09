@@ -1,5 +1,5 @@
 <?php
-namespace Songbird\Package\Twig\Parser;
+namespace Songbird\Template;
 
 use JamesMoss\Flywheel\DocumentInterface;
 use League\Container\ContainerAwareInterface;
@@ -9,10 +9,9 @@ use League\Event\ListenerInterface;
 use Songbird\ConfigAwareInterface;
 use Songbird\ConfigAwareTrait;
 
-abstract class AbstractParser extends AbstractListener implements ListenerInterface, ContainerAwareInterface,
-    ConfigAwareInterface
+abstract class ParserAbstract extends AbstractListener implements ListenerInterface, ContainerAwareInterface
 {
-    use ContainerAwareTrait, ConfigAwareTrait;
+    use ContainerAwareTrait;
 
     /**
      * @param \JamesMoss\Flywheel\DocumentInterface $document

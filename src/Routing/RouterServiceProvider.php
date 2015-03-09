@@ -7,12 +7,10 @@ use League\Route\Strategy\RequestResponseStrategy;
 use Songbird\ConfigAwareInterface;
 use Songbird\ConfigAwareTrait;
 
-class RouterServiceProvider extends ServiceProvider implements ConfigAwareInterface
+class RouterServiceProvider extends ServiceProvider
 {
-    use ConfigAwareTrait;
-
     protected $provides = [
-        'App.Router'
+        'Router'
     ];
 
     /**
@@ -24,8 +22,8 @@ class RouterServiceProvider extends ServiceProvider implements ConfigAwareInterf
      */
     public function register()
     {
-        $this->getContainer()->singleton('App.Router', new RouteCollection($this->getContainer()));
-        $this->getContainer()->get('App.Router')->setStrategy(new RequestResponseStrategy());
+        $this->getContainer()->singleton('Router', new RouteCollection($this->getContainer()));
+        $this->getContainer()->get('Router')->setStrategy(new RequestResponseStrategy());
         $this->addRoutes();
     }
 
@@ -35,10 +33,10 @@ class RouterServiceProvider extends ServiceProvider implements ConfigAwareInterf
     protected function addRoutes()
     {
         foreach (['GET', 'POST', 'PUT', 'DELETE'] as $method) {
-            $this->getContainer()->get('App.Router')->addRoute(
+            $this->getContainer()->get('Router')->addRoute(
                 $method,
                 '/{slug:.*}',
-                sprintf('%s::handle', $this->getConfig()->get('app.handler', 'Songbird\Controller'))
+                sprintf('%s::handle', $this->getContainer()->get('Config')->get('app.handler', 'Songbird\Controller'))
             );
         }
     }

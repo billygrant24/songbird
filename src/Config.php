@@ -1,7 +1,9 @@
 <?php
 namespace Songbird;
 
-class Config extends \Noodlehaus\Config
+use Noodlehaus\Config as NoodleConfig;
+
+class Config extends NoodleConfig
 {
     // ...
 }

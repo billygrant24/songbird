@@ -7,12 +7,10 @@ use Monolog\Logger;
 use Songbird\ConfigAwareInterface;
 use Songbird\ConfigAwareTrait;
 
-class LoggerServiceProvider extends ServiceProvider implements ConfigAwareInterface
+class LoggerServiceProvider extends ServiceProvider
 {
-    use ConfigAwareTrait;
-
     protected $provides = [
-        'App.Logger'
+        'Logger'
     ];
 
     /**
@@ -25,11 +23,11 @@ class LoggerServiceProvider extends ServiceProvider implements ConfigAwareInterf
     public function register()
     {
         $app = $this->getContainer();
-        $config = $this->getConfig();
+        $config = $this->getContainer()->get('Config');
 
-        $app->singleton('App.Logger', 'Monolog\Logger')->withArgument('songbird');
+        $app->singleton('Logger', 'Monolog\Logger')->withArgument('songbird');
 
         $fileName = vsprintf('%s/songbird-%s.log', [$config->get('app.paths.log'), date('Y-d-m')]);
-        $app->get('App.Logger')->pushHandler(new StreamHandler($fileName, Logger::INFO));
+        $app->get('Logger')->pushHandler(new StreamHandler($fileName, Logger::INFO));
     }
 }

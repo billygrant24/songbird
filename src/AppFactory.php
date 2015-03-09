@@ -12,10 +12,9 @@ class AppFactory
     {
         $app = new App();
 
-        $app->singleton('App', $app);
-        $app->singleton('App.Event', 'League\Event\Emitter');
-
+        $app->add('App', $app);
         $app->add('Config', $config);
+        $app->inflector('Songbird\ConfigAwareInterface')->invokeMethod('setConfig', [$app->get('Config')]);
         $app->add('App.Document.Transformer', $app->resolve('Songbird\Document\Transformer'));
 
         // Providers
@@ -23,8 +22,7 @@ class AppFactory
 
         // Inflectors
         $app->inflector('League\Container\ContainerAwareInterface')->invokeMethod('setContainer', [$app->get('App')]);
-        $app->inflector('League\Event\EmitterAwareInterface')->invokeMethod('setEmitter', [$app->get('App.Event')]);
-        $app->inflector('Songbird\Logger\LoggerAwareInterface')->invokeMethod('setLogger', [$app->get('App.Logger')]);
+        $app->inflector('Songbird\Logger\LoggerAwareInterface')->invokeMethod('setLogger', [$app->get('Logger')]);
 
         $app->registerMiddleware();
 

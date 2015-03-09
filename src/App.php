@@ -2,15 +2,14 @@
 namespace Songbird;
 
 use League\Container\Container;
-use League\Event\EmitterTrait;
-use League\Url\Url;
+use Songbird\Event\EventAwareTrait;
 use Symfony\Component\Debug\Debug;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class App extends Container
 {
-    use EmitterTrait;
+    use EventAwareTrait;
 
     /**
      * Handles a Request to convert it to a Response.
@@ -25,16 +24,8 @@ class App extends Container
         $this->add('Symfony\Component\HttpFoundation\Response', $response);
         $this->add('Symfony\Component\HttpFoundation\Request', $request);
 
-        $dispatcher = $this->get('App.Router')->getDispatcher();
+        $dispatcher = $this->get('Router')->getDispatcher();
         $path = rtrim($request->getPathInfo(), '/');
-
-        $this->addListener('BeforeDispatch', function ($event, $args) {
-            $url = Url::createFromUrl($args['request']->getUri());
-            if (count($url->getPath()->keys('blog')) > 0) {
-                $args['response']->setContent('you are reading my blog. bugger off.');
-//                $args['response']->send();
-            }
-        });
 
         $this->resolve('Songbird\Emitter\BeforeDispatchEmitter')->execute();
         $response = $dispatcher->dispatch($request->getMethod(), $path ? $path : '/');
@@ -78,6 +69,7 @@ class App extends Container
 
     public function addCoreServiceProviders()
     {
+        $this->addServiceProvider('Songbird\Event\EventServiceProvider');
         $this->addServiceProvider('Songbird\Filesystem\FilesystemServiceProvider');
         $this->addServiceProvider('Songbird\Logger\LoggerServiceProvider');
         $this->addServiceProvider('Songbird\Document\Repository\RepositoryServiceProvider');

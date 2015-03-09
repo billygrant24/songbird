@@ -7,10 +7,8 @@ use Songbird\ConfigAwareInterface;
 use Songbird\ConfigAwareTrait;
 use Songbird\Document\Formatter\Universal;
 
-class RepositoryServiceProvider extends ServiceProvider implements ConfigAwareInterface
+class RepositoryServiceProvider extends ServiceProvider
 {
-    use ConfigAwareTrait;
-
     protected $provides = [
         'App.Repo.Documents',
         'App.Repo.Fragments',
@@ -28,12 +26,13 @@ class RepositoryServiceProvider extends ServiceProvider implements ConfigAwareIn
         $app = $this->getContainer();
 
         foreach (['documents', 'fragments'] as $dir) {
-            $repositoryConfig = new FlywheelConfig($this->getConfig()->get('runtime.paths.resources'), [
-                'formatter' => new Universal(),
-                'query_class' => $this->hasAPC() ? '\\Songbird\\Document\\CachedQuery' :
-                    '\\Songbird\\Document\\Query',
-                'document_class' => '\\JamesMoss\\Flywheel\\Document',
-            ]);
+            $repositoryConfig = new FlywheelConfig($this->getContainer()->get('Config')->get('runtime.paths.resources'),
+                [
+                    'formatter' => new Universal(),
+                    'query_class' => $this->hasAPC() ? '\\Songbird\\Document\\CachedQuery' :
+                        '\\Songbird\\Document\\Query',
+                    'document_class' => '\\JamesMoss\\Flywheel\\Document',
+                ]);
 
             $alias = sprintf('App.Repo.%s', ucwords($dir));
 
