@@ -3,7 +3,7 @@
 namespace Songbird\Document\Repository;
 
 use JamesMoss\Flywheel\Config;
-use JamesMoss\Flywheel\DocumentInterface;
+use Songbird\Document\DocumentInterface;
 use Songbird\Filesystem\FilesystemAwareInterface;
 use Songbird\Filesystem\FilesystemAwareTrait;
 
@@ -106,7 +106,7 @@ class Repository implements FilesystemAwareInterface
      *
      * @param  string $id The ID of the document to find
      *
-     * @return Document|boolean  The document if it exists, false if not.
+     * @return \Songbird\Document\DocumentInterface|boolean  The document if it exists, false if not.
      */
     public function findById($id)
     {
@@ -133,7 +133,7 @@ class Repository implements FilesystemAwareInterface
     /**
      * Store a Document in the repository.
      *
-     * @param Document $document The document to store
+     * @param \Songbird\Document\DocumentInterface $document The document to store
      *
      * @return bool True if stored, otherwise false
      */
@@ -167,7 +167,7 @@ class Repository implements FilesystemAwareInterface
      * Store a Document in the repository, but only if it already
      * exists. The document must have an ID.
      *
-     * @param Document $document The document to store
+     * @param \Songbird\Document\DocumentInterface $document The document to store
      *
      * @return bool True if stored, otherwise false
      */

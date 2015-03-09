@@ -4,17 +4,17 @@ namespace Songbird;
 class AppFactory
 {
     /**
-     * @param \Songbird\Config $config
+     * @param string $config
      *
      * @return \Songbird\App
      */
-    public static function createApplication(Config $config = null)
+    public static function createApplication($config = '')
     {
         $app = new App();
 
         $app->add('App', $app);
-        $app->add('Config', $config);
-        $app->add('App.Document.Transformer', $app->resolve('Songbird\Document\Transformer'));
+        $app->add('Config', new Config($config));
+        $app->add('Document.Transformer', $app->resolve('Songbird\Document\Transformer'));
 
         // Providers
         $app->addCoreServiceProviders();

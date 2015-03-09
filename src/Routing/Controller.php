@@ -1,10 +1,10 @@
 <?php
 namespace Songbird\Routing;
 
-use JamesMoss\Flywheel\DocumentInterface;
 use League\Container\ContainerAwareInterface;
 use League\Container\ContainerAwareTrait;
 use League\Container\Exception\ReflectionException;
+use Songbird\Document\DocumentInterface;
 use Songbird\Event\EventAwareTrait;
 use Songbird\Logger\LoggerAwareInterface;
 use Songbird\Logger\LoggerAwareTrait;
@@ -27,7 +27,7 @@ class Controller implements ContainerAwareInterface, LoggerAwareInterface
     {
         $slug = $args['slug'] ? $args['slug'] : 'home';
 
-        $repo = $this->getContainer()->get('App.Repo.Documents');
+        $repo = $this->getContainer()->get('Repo.Documents');
         if (!$document = $repo->findById($slug)) {
             $document = $repo->findById('404');
         }
@@ -39,7 +39,7 @@ class Controller implements ContainerAwareInterface, LoggerAwareInterface
         if ($request->isMethod('get')) {
             // Run middleware for content transforms (the Markdown parser, for example).
             $this->getContainer()->resolve('Songbird\Emitter\BeforeDocumentTransformEmitter')->execute($document);
-            $document = $this->getContainer()->get('App.Document.Transformer')->apply($document);
+            $document = $this->getContainer()->get('Document.Transformer')->apply($document);
             $this->getContainer()->resolve('Songbird\Emitter\AfterDocumentTransformEmitter')->execute($document);
 
             try {
@@ -61,7 +61,7 @@ class Controller implements ContainerAwareInterface, LoggerAwareInterface
      * @param \Symfony\Component\HttpFoundation\Request  $request
      * @param \Symfony\Component\HttpFoundation\Response $response
      * @param array                                      $args
-     * @param \JamesMoss\Flywheel\DocumentInterface      $document
+     * @param \Songbird\Document\DocumentInterface       $document
      */
     protected function handleListeners(Request $request, Response $response, $args, DocumentInterface $document)
     {

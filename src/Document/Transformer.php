@@ -1,14 +1,12 @@
 <?php
 namespace Songbird\Document;
 
-use JamesMoss\Flywheel\DocumentInterface;
-
 class Transformer
 {
     /**
-     * @param \JamesMoss\Flywheel\DocumentInterface $document
+     * @param \Songbird\Document\DocumentInterface $document
      *
-     * @return \JamesMoss\Flywheel\DocumentInterface
+     * @return \Songbird\Document\DocumentInterface
      */
     public function apply(DocumentInterface $document)
     {

@@ -3,7 +3,7 @@
 namespace Songbird\Document\Repository;
 
 use DomainException;
-use JamesMoss\Flywheel\DocumentInterface;
+use Songbird\Document\DocumentInterface;
 
 /**
  * Repository
@@ -16,7 +16,7 @@ class ReadOnlyRepository extends Repository
     /**
      * Store a Document in the repository.
      *
-     * @param Document $document The document to store
+     * @param \Songbird\Document\DocumentInterface $document The document to store
      *
      * @return bool True if stored, otherwise false
      */
@@ -29,7 +29,7 @@ class ReadOnlyRepository extends Repository
      * Store a Document in the repository, but only if it already
      * exists. The document must have an ID.
      *
-     * @param Document $document The document to store
+     * @param \Songbird\Document\DocumentInterface $document The document to store
      *
      * @return bool True if stored, otherwise false
      */

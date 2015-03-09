@@ -10,8 +10,8 @@ use Songbird\Document\Formatter\Universal;
 class RepositoryServiceProvider extends ServiceProvider
 {
     protected $provides = [
-        'App.Repo.Documents',
-        'App.Repo.Fragments',
+        'Repo.Documents',
+        'Repo.Fragments',
     ];
 
     /**
@@ -31,10 +31,10 @@ class RepositoryServiceProvider extends ServiceProvider
                     'formatter' => new Universal(),
                     'query_class' => $this->hasAPC() ? '\\Songbird\\Document\\CachedQuery' :
                         '\\Songbird\\Document\\Query',
-                    'document_class' => '\\JamesMoss\\Flywheel\\Document',
+                    'document_class' => '\\Songbird\\Document\\Document',
                 ]);
 
-            $alias = sprintf('App.Repo.%s', ucwords($dir));
+            $alias = sprintf('Repo.%s', ucwords($dir));
 
             $repo = new NestedRepository($dir, $repositoryConfig);
             $repo->setFilesystem($this->getContainer()->get('Filesystem'));

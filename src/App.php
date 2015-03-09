@@ -14,14 +14,13 @@ class App extends Container
     /**
      * Handles a Request to convert it to a Response.
      *
-     * @param \Symfony\Component\HttpFoundation\Request  $request A Request instance
-     * @param \Symfony\Component\HttpFoundation\Response $response
+     * @param \Symfony\Component\HttpFoundation\Request $request A Request instance
      *
      * @return \Symfony\Component\HttpFoundation\Response A Response instance
      */
-    public function run(Request $request, Response $response)
+    public function run(Request $request)
     {
-        $this->add('Symfony\Component\HttpFoundation\Response', $response);
+        $this->add('Symfony\Component\HttpFoundation\Response', new Response());
         $this->add('Symfony\Component\HttpFoundation\Request', $request);
 
         $dispatcher = $this->get('Router')->getDispatcher();

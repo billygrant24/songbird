@@ -1,20 +1,20 @@
 <?php
 namespace Songbird\Template;
 
-use JamesMoss\Flywheel\DocumentInterface;
 use League\Container\ContainerAwareInterface;
 use League\Container\ContainerAwareTrait;
 use League\Event\AbstractListener;
 use League\Event\ListenerInterface;
 use Songbird\ConfigAwareInterface;
 use Songbird\ConfigAwareTrait;
+use Songbird\Document\DocumentInterface;
 
 abstract class ParserAbstract extends AbstractListener implements ListenerInterface, ContainerAwareInterface
 {
     use ContainerAwareTrait;
 
     /**
-     * @param \JamesMoss\Flywheel\DocumentInterface $document
+     * @param \Songbird\Document\DocumentInterface $document
      *
      * @return array
      */
