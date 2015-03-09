@@ -14,7 +14,6 @@ class AppFactory
 
         $app->add('App', $app);
         $app->add('Config', $config);
-        $app->inflector('Songbird\ConfigAwareInterface')->invokeMethod('setConfig', [$app->get('Config')]);
         $app->add('App.Document.Transformer', $app->resolve('Songbird\Document\Transformer'));
 
         // Providers
