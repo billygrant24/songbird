@@ -55,13 +55,13 @@ class App extends Container
         return Debug::enable();
     }
 
-    public function registerMiddleware()
+    public function registerPackages()
     {
-        $middleware = $this->get('Config')['middleware'];
+        $packages = $this->get('Config')['packages'];
 
-        if (is_array($middleware)) {
-            foreach ($middleware as $service) {
-                $this->get($service)->register();
+        if (is_array($packages)) {
+            foreach ($packages as $package) {
+                $this->resolve($package)->register();
             }
         }
     }
