@@ -33,7 +33,7 @@ class Controller implements ContainerAwareInterface, LoggerAwareInterface
         }
 
         // Fire any events for the current document.
-        $this->handleListeners($request, $response, $args, $document);
+        $this->handleListeners($request, $response, $document);
 
         // We can assume that if the method is GET we want to set content body.
         if ($request->isMethod('get')) {
@@ -60,21 +60,20 @@ class Controller implements ContainerAwareInterface, LoggerAwareInterface
      *
      * @param \Symfony\Component\HttpFoundation\Request  $request
      * @param \Symfony\Component\HttpFoundation\Response $response
-     * @param array                                      $args
      * @param \Songbird\Document\DocumentInterface       $document
      */
-    protected function handleListeners(Request $request, Response $response, $args, DocumentInterface $document)
+    protected function handleListeners(Request $request, Response $response, DocumentInterface $document)
     {
         $verb = strtolower($request->getMethod());
 
         if (isset($document->_listen[$verb])) {
             $listeners = $document->_listen[$verb];
+        }
+        
+        if (isset($document->_listen['all'])) {
+            $listeners = $document->_listen['all'];
         } else {
-            if (isset($document->_listen['all'])) {
-                $listeners = $document->_listen['all'];
-            } else {
-                $listeners = [];
-            }
+            $listeners = [];
         }
 
         if (!is_array($listeners)) {
