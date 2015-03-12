@@ -19,12 +19,21 @@ abstract class PackageProviderAbstract extends ServiceProvider
 
         $this->registerPackage($app);
         $this->registerEventListeners($app, $app->get('Event'));
+        $this->registerRoutes($app, $app->get('Router'));
     }
 
     /**
      * @param \League\Container\ContainerInterface $app
      */
     protected function registerEventListeners(ContainerInterface $app, $event = null)
+    {
+        // ...
+    }
+
+    /**
+     * Add all routes required to handle document requests.
+     */
+    protected function registerRoutes($app, $router)
     {
         // ...
     }

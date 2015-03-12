@@ -14,7 +14,7 @@ class Config extends NoodleConfig
 
     public function loadEnvironment()
     {
-        $env = new Env(getcwd() . '/../.env');
+        $env = new Environment(getcwd() . '/../.env');
 
         return $env->parse()->prefix('APP_')->define();
     }

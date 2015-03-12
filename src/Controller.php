@@ -1,10 +1,9 @@
 <?php
-namespace Songbird\Routing;
+namespace Songbird;
 
 use League\Container\ContainerAwareInterface;
 use League\Container\ContainerAwareTrait;
 use League\Container\Exception\ReflectionException;
-use Songbird\ContainerResolverTrait;
 use Songbird\Document\DocumentInterface;
 use Songbird\Event\EventAwareTrait;
 use Songbird\Log\LoggerAwareInterface;

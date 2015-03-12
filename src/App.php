@@ -72,6 +72,19 @@ class App extends Container
         $this->addServiceProvider('Songbird\Filesystem\FilesystemServiceProvider');
         $this->addServiceProvider('Songbird\Log\LoggerServiceProvider');
         $this->addServiceProvider('Songbird\Document\Repository\RepositoryServiceProvider');
-        $this->addServiceProvider('Songbird\Routing\RouterServiceProvider');
+    }
+
+    /**
+     * Add all routes required to handle document requests.
+     */
+    public function addRoutes()
+    {
+        foreach (['GET', 'POST', 'PUT', 'DELETE'] as $method) {
+            $this->get('Router')->addRoute(
+                $method,
+                '/{slug:.*}',
+                sprintf('%s::handle', $this->get('Config')->get('app.handler', 'Songbird\Controller'))
+            );
+        }
     }
 }
