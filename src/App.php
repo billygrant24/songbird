@@ -26,9 +26,9 @@ class App extends Container
         $dispatcher = $this->get('Router')->getDispatcher();
         $path = rtrim($request->getPathInfo(), '/');
 
-        $this->resolve('Songbird\Emitter\BeforeDispatchEmitter')->execute();
+        $this->emit('BeforeDispatch', ['request' => $request]);
         $response = $dispatcher->dispatch($request->getMethod(), $path ? $path : '/');
-        $this->resolve('Songbird\Emitter\AfterDispatchEmitter')->execute();
+        $this->emit('AfterDispatch', ['request' => $request, 'response' => $response]);
 
         return $response;
     }
@@ -70,7 +70,7 @@ class App extends Container
     {
         $this->addServiceProvider('Songbird\Event\EventServiceProvider');
         $this->addServiceProvider('Songbird\Filesystem\FilesystemServiceProvider');
-        $this->addServiceProvider('Songbird\Logger\LoggerServiceProvider');
+        $this->addServiceProvider('Songbird\Log\LoggerServiceProvider');
         $this->addServiceProvider('Songbird\Document\Repository\RepositoryServiceProvider');
         $this->addServiceProvider('Songbird\Routing\RouterServiceProvider');
     }

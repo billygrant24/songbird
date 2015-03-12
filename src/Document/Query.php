@@ -25,6 +25,8 @@ class Query
         '<=',
         '==',
         '===',
+        '!=',
+        'in',
     );
 
     /**
@@ -98,7 +100,7 @@ class Query
     public function where($field, $operator, $value)
     {
         // todo, validate these args
-        $this->where = array($field, $operator, $value);
+        $this->where[] = array($field, $operator, $value);
 
         return $this;
     }
@@ -113,27 +115,38 @@ class Query
         $documents = $this->repo->findAll();
 
         if ($this->where) {
-            list($field, $operator, $predicate) = $this->where;
-            $documents = array_filter($documents, function ($doc) use ($field, $operator, $predicate) {
-                $value = $doc->{$field};
+            foreach ($this->where as $where) {
+                list($field, $operator, $predicate) = $where;
 
-                switch (true) {
-                    case ($operator === '==' && $value == $predicate):
-                        return true;
-                    case ($operator === '===' && $value === $predicate):
-                        return true;
-                    case ($operator === '>' && $value > $predicate):
-                        return true;
-                    case ($operator === '>=' && $value >= $predicate):
-                        return true;
-                    case ($operator === '<' && $value < $predicate):
-                        return true;
-                    case ($operator === '>=' && $value >= $predicate):
-                        return true;
-                }
+                $documents = array_filter($documents, function ($doc) use ($field, $operator, $predicate) {
+                    if (!isset($doc->{$field})) {
+                        return false;
+                    }
 
-                return false;
-            });
+                    $value = $doc->{$field};
+
+                    switch (true) {
+                        case ($operator === 'in' && strpos($predicate, $value)):
+                            return true;
+                        case ($operator === '!=' && $value != $predicate):
+                            return true;
+                        case ($operator === '==' && $value == $predicate):
+                            return true;
+                        case ($operator === '===' && $value === $predicate):
+                            return true;
+                        case ($operator === '>' && $value > $predicate):
+                            return true;
+                        case ($operator === '>=' && $value >= $predicate):
+                            return true;
+                        case ($operator === '<' && $value < $predicate):
+                            return true;
+                        case ($operator === '>=' && $value >= $predicate):
+                            return true;
+                    }
+
+                    return false;
+                });
+            }
         }
 
         if ($this->orderBy) {

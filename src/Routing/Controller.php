@@ -4,16 +4,17 @@ namespace Songbird\Routing;
 use League\Container\ContainerAwareInterface;
 use League\Container\ContainerAwareTrait;
 use League\Container\Exception\ReflectionException;
+use Songbird\ContainerResolverTrait;
 use Songbird\Document\DocumentInterface;
 use Songbird\Event\EventAwareTrait;
-use Songbird\Logger\LoggerAwareInterface;
-use Songbird\Logger\LoggerAwareTrait;
+use Songbird\Log\LoggerAwareInterface;
+use Songbird\Log\LoggerAwareTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class Controller implements ContainerAwareInterface, LoggerAwareInterface
 {
-    use ContainerAwareTrait, LoggerAwareTrait, EventAwareTrait;
+    use ContainerAwareTrait, ContainerResolverTrait, LoggerAwareTrait, EventAwareTrait;
 
     /**
      * @param \Symfony\Component\HttpFoundation\Request  $request
@@ -25,26 +26,20 @@ class Controller implements ContainerAwareInterface, LoggerAwareInterface
      */
     public function handle(Request $request, Response $response, array $args)
     {
-        $slug = $args['slug'] ? $args['slug'] : 'home';
-
-        $repo = $this->getContainer()->get('Repo.Documents');
-        if (!$document = $repo->findById($slug)) {
-            $document = $repo->findById('404');
-        }
+        $document = $this->getDocument($args['slug']);
 
         // Fire any events for the current document.
         $this->handleListeners($request, $response, $document);
 
         // We can assume that if the method is GET we want to set content body.
         if ($request->isMethod('get')) {
-            // Run middleware for content transforms (the Markdown parser, for example).
-            $this->getContainer()->resolve('Songbird\Emitter\BeforeDocumentTransformEmitter')->execute($document);
-            $document = $this->getContainer()->get('Document.Transformer')->apply($document);
-            $this->getContainer()->resolve('Songbird\Emitter\AfterDocumentTransformEmitter')->execute($document);
+            $this->emit('BeforeDocumentTransform', ['request' => $request, 'response' => $response, 'document' => $document]);
+            $this->resolve('Document.Transformer')->apply($document);
+            $this->emit('AfterDocumentTransform', ['request' => $request, 'response' => $response, 'document' => $document]);
 
             try {
                 $template = $document->_template;
-                $content = $this->getContainer()->get('Template')->render($template, $document);
+                $content = $this->resolve('Template')->render($template, $document);
             } catch (ReflectionException $e) {
                 $content = $document->body;
             }
@@ -53,6 +48,23 @@ class Controller implements ContainerAwareInterface, LoggerAwareInterface
         }
 
         return $response;
+    }
+
+    /**
+     * @param string $documentId
+     *
+     * @return mixed
+     */
+    protected function getDocument($documentId)
+    {
+        $repo = $this->resolve('Repo.Documents');
+
+        $documentId = $documentId ? $documentId : 'home';
+        if (!$document = $repo->findById($documentId)) {
+           return $repo->findById('404');
+        }
+
+        return $document;
     }
 
     /**
@@ -69,7 +81,7 @@ class Controller implements ContainerAwareInterface, LoggerAwareInterface
         if (isset($document->_listen[$verb])) {
             $listeners = $document->_listen[$verb];
         }
-        
+
         if (isset($document->_listen['all'])) {
             $listeners = $document->_listen['all'];
         } else {
@@ -82,7 +94,7 @@ class Controller implements ContainerAwareInterface, LoggerAwareInterface
 
         foreach ($listeners as $listener) {
             $this->addListener($listener,
-                $this->getContainer()->resolve($listener, [$request, $response, $args]));
+                $this->resolve($listener, [$request, $response]));
 
             $this->emit($listener);
         }

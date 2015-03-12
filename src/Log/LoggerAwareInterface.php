@@ -1,5 +1,5 @@
 <?php
-namespace Songbird\Logger;
+namespace Songbird\Log;
 
 use Monolog\Logger;
 

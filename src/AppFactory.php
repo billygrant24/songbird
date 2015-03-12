@@ -21,7 +21,7 @@ class AppFactory
 
         // Inflectors
         $app->inflector('League\Container\ContainerAwareInterface')->invokeMethod('setContainer', [$app->get('App')]);
-        $app->inflector('Songbird\Logger\LoggerAwareInterface')->invokeMethod('setLogger', [$app->get('Logger')]);
+        $app->inflector('Songbird\Log\LoggerAwareInterface')->invokeMethod('setLogger', [$app->get('Logger')]);
 
         $app->registerPackages();
 

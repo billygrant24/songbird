@@ -2,8 +2,8 @@
 namespace Songbird\Listener;
 
 use League\Event\EventInterface;
-use Songbird\Logger\LoggerAwareInterface;
-use Songbird\Logger\LoggerAwareTrait;
+use Songbird\Log\LoggerAwareInterface;
+use Songbird\Log\LoggerAwareTrait;
 
 class PageNotFound extends HttpEventListenerAbstract implements LoggerAwareInterface
 {

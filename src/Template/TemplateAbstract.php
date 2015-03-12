@@ -75,4 +75,22 @@ abstract class TemplateAbstract implements TemplateInterface
 
         return $meta;
     }
+
+    protected function replacePlaceholders($body, $data = [], $prefix = '')
+    {
+        if (!$data) {
+            $data = array_merge($this->getEngine()->getData(), $this->getData()['meta']);
+        }
+
+        foreach ($data as $key => $meta) {
+            if (is_array($meta)) {
+                $body = $this->replacePlaceholders($body, $meta, $key . '.');
+                continue;
+            }
+
+            $body = str_replace('{{ ' . $prefix . $key . ' }}', $meta, $body);
+        }
+
+        return $body;
+    }
 }
