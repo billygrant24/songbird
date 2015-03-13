@@ -21,6 +21,7 @@ class AppFactory
         $app->add('Config', new Config($config));
         $app->add('Document.Transformer', $app->resolve('Songbird\Document\Transformer'));
 
+
         $app->add('Router', new RouteCollection($app));
         $app->get('Router')->setStrategy(new RequestResponseStrategy());
 

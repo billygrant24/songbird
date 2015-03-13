@@ -1,5 +1,5 @@
 <?php
-namespace Songbird\Document\Pagination;
+namespace Songbird\Pagination;
 
 class Paginator implements PaginatorInterface
 {
@@ -86,7 +86,7 @@ class Paginator implements PaginatorInterface
      */
     public function getTotal()
     {
-        return $this->result->total();
+        return $this->result->count();
     }
 
     /**
@@ -96,7 +96,7 @@ class Paginator implements PaginatorInterface
      */
     public function getPerPage()
     {
-        return $this->result->limit();
+        return $this->result->perPage;
     }
 
     /**

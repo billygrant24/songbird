@@ -23,11 +23,10 @@ class LoggerServiceProvider extends ServiceProvider
     public function register()
     {
         $app = $this->getContainer();
-        $config = $this->getContainer()->get('Config');
 
         $app->singleton('Logger', 'Monolog\Logger')->withArgument('songbird');
 
-        $fileName = vsprintf('%s/songbird-%s.log', [$config->get('app.paths.log'), date('Y-d-m')]);
+        $fileName = vsprintf('%s/songbird-%s.log', [$app->config('app.paths.log'), date('Y-d-m')]);
         $app->get('Logger')->pushHandler(new StreamHandler($fileName, Logger::INFO));
     }
 }

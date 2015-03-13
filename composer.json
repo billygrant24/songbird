@@ -14,11 +14,12 @@
     "league/flysystem": "~1.0",
     "league/flysystem-cached-adapter": "~1.0",
     "league/route": "~1.1",
-    "jamesmoss/flywheel": "0.4.*",
     "josegonzalez/dotenv": "0.6.*",
     "monolog/monolog": "~1.12",
     "noodlehaus/config": "0.7.*",
-    "symfony/debug": "~2.6"
+    "symfony/debug": "~2.6",
+    "illuminate/support": "~5.0",
+    "symfony/var-dumper": "~2.6"
   },
   "autoload": {
     "psr-4": {

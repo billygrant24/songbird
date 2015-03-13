@@ -8,7 +8,7 @@ class Transformer
      *
      * @return \Songbird\Document\DocumentInterface
      */
-    public function apply(DocumentInterface $document)
+    public function apply($document)
     {
         return $document;
     }

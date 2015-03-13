@@ -1,5 +1,5 @@
 <?php
-namespace Songbird\Document\Pagination;
+namespace Songbird\Pagination;
 
 interface PaginatorInterface
 {

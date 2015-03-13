@@ -26,43 +26,11 @@ abstract class TemplateAbstract implements TemplateInterface
     abstract public function render($content, $data = null);
 
     /**
-     * @return array
-     */
-    public function getData()
-    {
-        return $this->data;
-    }
-
-    /**
-     * @param array $data
-     */
-    public function setData(array $data)
-    {
-        $this->data = array_merge($this->getData(), $data);
-    }
-
-    /**
-     * @return object
-     */
-    public function getEngine()
-    {
-        return $this->engine;
-    }
-
-    /**
-     * @param object $engine
-     */
-    public function setEngine($engine)
-    {
-        $this->engine = $engine;
-    }
-
-    /**
      * @param \Songbird\Document\DocumentInterface $document
      *
      * @return array
      */
-    protected function parseMeta(DocumentInterface $document)
+    protected function parseMeta($document)
     {
         $meta = [];
         foreach ($document as $key => $value) {
@@ -83,6 +51,10 @@ abstract class TemplateAbstract implements TemplateInterface
         }
 
         foreach ($data as $key => $meta) {
+            if ($key === 'repository') {
+                continue;
+            }
+
             if (is_array($meta)) {
                 $body = $this->replacePlaceholders($body, $meta, $key . '.');
                 continue;
@@ -92,5 +64,37 @@ abstract class TemplateAbstract implements TemplateInterface
         }
 
         return $body;
+    }
+
+    /**
+     * @return object
+     */
+    public function getEngine()
+    {
+        return $this->engine;
+    }
+
+    /**
+     * @param object $engine
+     */
+    public function setEngine($engine)
+    {
+        $this->engine = $engine;
+    }
+
+    /**
+     * @return array
+     */
+    public function getData()
+    {
+        return $this->data;
+    }
+
+    /**
+     * @param array $data
+     */
+    public function setData(array $data)
+    {
+        $this->data = array_merge($this->getData(), $data);
     }
 }

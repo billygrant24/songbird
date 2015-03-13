@@ -26,9 +26,9 @@ class App extends Container
         $dispatcher = $this->get('Router')->getDispatcher();
         $path = rtrim($request->getPathInfo(), '/');
 
-        $this->emit('BeforeDispatch', ['request' => $request]);
+        $this->emit('BeforeDispatch', [$request]);
         $response = $dispatcher->dispatch($request->getMethod(), $path ? $path : '/');
-        $this->emit('AfterDispatch', ['request' => $request, 'response' => $response]);
+        $this->emit('AfterDispatch', [$request, $response]);
 
         return $response;
     }
@@ -57,7 +57,7 @@ class App extends Container
 
     public function registerPackages()
     {
-        $packages = $this->get('Config')['packages'];
+        $packages = $this->config('packages');
 
         if (is_array($packages)) {
             foreach ($packages as $package) {
@@ -71,7 +71,17 @@ class App extends Container
         $this->addServiceProvider('Songbird\Event\EventServiceProvider');
         $this->addServiceProvider('Songbird\Filesystem\FilesystemServiceProvider');
         $this->addServiceProvider('Songbird\Log\LoggerServiceProvider');
-        $this->addServiceProvider('Songbird\Document\Repository\RepositoryServiceProvider');
+    }
+
+    /**
+     * @param string     $key
+     * @param mixed|null $defaultValue
+     *
+     * @return mixed
+     */
+    public function config($key, $defaultValue = null)
+    {
+        return $this->get('Config')->get($key, $defaultValue);
     }
 
     /**
@@ -82,8 +92,8 @@ class App extends Container
         foreach (['GET', 'POST', 'PUT', 'DELETE'] as $method) {
             $this->get('Router')->addRoute(
                 $method,
-                '/{slug:.*}',
-                sprintf('%s::handle', $this->get('Config')->get('app.handler', 'Songbird\Controller'))
+                '/{documentId:.*}',
+                sprintf('%s::handle', $this->config('app.handler', 'Songbird\Controller'))
             );
         }
     }

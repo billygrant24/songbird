@@ -4,7 +4,6 @@ namespace Songbird;
 use League\Container\ContainerAwareInterface;
 use League\Container\ContainerAwareTrait;
 use League\Container\Exception\ReflectionException;
-use Songbird\Document\DocumentInterface;
 use Songbird\Event\EventAwareTrait;
 use Songbird\Log\LoggerAwareInterface;
 use Songbird\Log\LoggerAwareTrait;
@@ -25,22 +24,22 @@ class Controller implements ContainerAwareInterface, LoggerAwareInterface
      */
     public function handle(Request $request, Response $response, array $args)
     {
-        $document = $this->getDocument($args['slug']);
+        $document = $this->getDocument($args['documentId']);
 
         // Fire any events for the current document.
         $this->handleListeners($request, $response, $document);
 
         // We can assume that if the method is GET we want to set content body.
         if ($request->isMethod('get')) {
-            $this->emit('BeforeDocumentTransform', ['request' => $request, 'response' => $response, 'document' => $document]);
-            $this->resolve('Document.Transformer')->apply($document);
-            $this->emit('AfterDocumentTransform', ['request' => $request, 'response' => $response, 'document' => $document]);
+            $this->emit('BeforeDocumentTransform', [$request, $response, $document]);
+            $document = $this->resolve('Document.Transformer')->apply($document);
+            $this->emit('AfterDocumentTransform', [$request, $response, $document]);
 
             try {
-                $template = $document->_template;
+                $template = $document['_template'];
                 $content = $this->resolve('Template')->render($template, $document);
             } catch (ReflectionException $e) {
-                $content = $document->body;
+                $content = $document['body'];
             }
 
             $response->setContent($content);
@@ -56,14 +55,7 @@ class Controller implements ContainerAwareInterface, LoggerAwareInterface
      */
     protected function getDocument($documentId)
     {
-        $repo = $this->resolve('Repo.Documents');
-
-        $documentId = $documentId ? $documentId : 'home';
-        if (!$document = $repo->findById($documentId)) {
-           return $repo->findById('404');
-        }
-
-        return $document;
+        return $this->resolve('Document.Repository')->find($documentId ? $documentId : 'home');
     }
 
     /**
@@ -73,7 +65,7 @@ class Controller implements ContainerAwareInterface, LoggerAwareInterface
      * @param \Symfony\Component\HttpFoundation\Response $response
      * @param \Songbird\Document\DocumentInterface       $document
      */
-    protected function handleListeners(Request $request, Response $response, DocumentInterface $document)
+    protected function handleListeners(Request $request, Response $response, $document)
     {
         $verb = strtolower($request->getMethod());
 
