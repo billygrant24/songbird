@@ -8,7 +8,7 @@ use League\Flysystem\Cached\Storage\Memory as CacheStore;
 use Songbird\ConfigAwareInterface;
 use Songbird\ConfigAwareTrait;
 use Songbird\Document\Collection;
-use Songbird\Document\Formatter\Universal;
+use Songbird\Document\Formatter;
 use Songbird\Document\Repository;
 
 class FilesystemServiceProvider extends ServiceProvider
@@ -23,8 +23,6 @@ class FilesystemServiceProvider extends ServiceProvider
      */
     protected $provides = [
         'Filesystem',
-        'Document.Repository',
-        'Fragment.Repository',
         'Songbird\Filesystem\FilesystemAwareInterface',
     ];
 
@@ -44,33 +42,5 @@ class FilesystemServiceProvider extends ServiceProvider
         $app->add('Filesystem', 'Songbird\Filesystem\Filesystem')->withArgument($adapter);
 
         $app->inflector('Songbird\Filesystem\FilesystemAwareInterface')->invokeMethod('setFilesystem', ['Filesystem']);
-
-        $fs = $app->resolve('Filesystem');
-
-        $docs = Collection::make($fs->listContents('documents', true));
-        $docs = $docs->map(function ($doc) use ($fs) {
-            if (isset($doc['extension']) && $doc['extension'] === 'md') {
-                $parsed = new Universal();
-                $arr['id'] = str_replace(['documents/', '.md'], '', $doc['path']);
-                $arr = array_merge($arr, $parsed->decode($fs->read($doc['path'])));
-
-                return $arr;
-            }
-        });
-
-        $app->add('Document.Repository', new Repository($docs));
-
-        $docs = Collection::make($fs->listContents('fragments', true));
-        $docs = $docs->map(function ($doc) use ($fs) {
-            if (isset($doc['extension']) && $doc['extension'] === 'md') {
-                $parsed = new Universal();
-                $arr['id'] = str_replace(['fragments/', '.md'], '', $doc['path']);
-                $arr = array_merge($arr, $parsed->decode($fs->read($doc['path'])));
-
-                return $arr;
-            }
-        });
-
-        $app->add('Fragment.Repository', new Repository($docs));
     }
 }

@@ -2,11 +2,10 @@
 namespace Songbird\Event;
 
 use League\Event\EmitterTrait;
+use League\Event\ListenerAcceptorInterface;
 
 trait EventAwareTrait
 {
-    use EmitterTrait;
-
     /**
      * @var \Songbird\Event\Event
      */
@@ -26,5 +25,15 @@ trait EventAwareTrait
     public function setEvent(Event $event)
     {
         $this->event = $event;
+    }
+
+    public function addListener($event, $listener, $priority = ListenerAcceptorInterface::P_NORMAL)
+    {
+        return $this->getEvent()->addListener($event, $listener, $priority);
+    }
+
+    public function emit($event, $args = [])
+    {
+        return $this->getEvent()->emit($event, $args);
     }
 }

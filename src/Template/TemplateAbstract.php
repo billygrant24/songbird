@@ -1,10 +1,14 @@
 <?php
 namespace Songbird\Template;
 
+use League\Container\ContainerAwareInterface;
+use League\Container\ContainerAwareTrait;
 use Songbird\Document\DocumentInterface;
 
-abstract class TemplateAbstract implements TemplateInterface
+abstract class TemplateAbstract implements ContainerAwareInterface, TemplateInterface
 {
+    use ContainerAwareTrait;
+
     /**
      * @var object
      */
@@ -51,10 +55,6 @@ abstract class TemplateAbstract implements TemplateInterface
         }
 
         foreach ($data as $key => $meta) {
-            if ($key === 'repository') {
-                continue;
-            }
-
             if (is_array($meta)) {
                 $body = $this->replacePlaceholders($body, $meta, $key . '.');
                 continue;
@@ -87,6 +87,17 @@ abstract class TemplateAbstract implements TemplateInterface
      */
     public function getData()
     {
+        $app = $this->getContainer();
+        $config = $this->getContainer()->get('Config');
+
+        $this->getEngine()->addData([
+            'siteTitle' => $config->get('vars.siteTitle'),
+            'baseUrl' => $config->get('vars.baseUrl'),
+            'themeDir' => $config->get('vars.baseUrl') . '/themes/' . $config->get('app.theme'),
+            'dateFormat' => $config->get('vars.dateFormat'),
+            'excerptLength' => $config->get('vars.excerptLength'),
+        ]);
+
         return $this->data;
     }
 

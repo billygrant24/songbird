@@ -16,7 +16,7 @@ class EventServiceProvider extends ServiceProvider
     {
         $app = $this->getContainer();
 
-        $app->add('Event', 'Songbird\Event\Event');
+        $app->singleton('Event', 'Songbird\Event\Event');
         $app->inflector('Songbird\Event\EventAwareInterface')->invokeMethod('setEvent', [$app->get('Event')]);
     }
 }

@@ -4,13 +4,14 @@ namespace Songbird;
 use League\Container\ContainerAwareInterface;
 use League\Container\ContainerAwareTrait;
 use League\Container\Exception\ReflectionException;
+use Songbird\Event\EventAwareInterface;
 use Songbird\Event\EventAwareTrait;
 use Songbird\Log\LoggerAwareInterface;
 use Songbird\Log\LoggerAwareTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class Controller implements ContainerAwareInterface, LoggerAwareInterface
+class Controller implements ContainerAwareInterface, LoggerAwareInterface, EventAwareInterface
 {
     use ContainerAwareTrait, ContainerResolverTrait, LoggerAwareTrait, EventAwareTrait;
 
@@ -26,18 +27,15 @@ class Controller implements ContainerAwareInterface, LoggerAwareInterface
     {
         $document = $this->getDocument($args['documentId']);
 
+        $this->emit('PrepareDocument', ['document' => &$document]);
+
         // Fire any events for the current document.
         $this->handleListeners($request, $response, $document);
 
         // We can assume that if the method is GET we want to set content body.
         if ($request->isMethod('get')) {
-            $this->emit('BeforeDocumentTransform', [$request, $response, $document]);
-            $document = $this->resolve('Document.Transformer')->apply($document);
-            $this->emit('AfterDocumentTransform', [$request, $response, $document]);
-
             try {
-                $template = $document['_template'];
-                $content = $this->resolve('Template')->render($template, $document);
+                $content = $this->resolve('Template')->render($document['_template'], $document);
             } catch (ReflectionException $e) {
                 $content = $document['body'];
             }
@@ -69,12 +67,12 @@ class Controller implements ContainerAwareInterface, LoggerAwareInterface
     {
         $verb = strtolower($request->getMethod());
 
-        if (isset($document->_listen[$verb])) {
-            $listeners = $document->_listen[$verb];
+        if (isset($document['_listen'][$verb])) {
+            $listeners = $document['_listen'][$verb];
         }
 
-        if (isset($document->_listen['all'])) {
-            $listeners = $document->_listen['all'];
+        if (isset($document['_listen']['all'])) {
+            $listeners = $document['_listen']['all'];
         } else {
             $listeners = [];
         }

@@ -10,15 +10,15 @@ class Collection extends IlluminateCollection
     /**
      * "Paginate" the collection by slicing it into a smaller collection.
      *
-     * @param  int $page
      * @param  int $perPage
      *
      * @return static
      */
-    public function forPage($page, $perPage)
+    public function paginate($perPage)
     {
+        $page = isset($_GET['page']) ? $_GET['page'] : 1;
         $this->perPage = $perPage;
 
-        return parent::forPage($page, $perPage);
+        return $this->forPage($page, $this->perPage);
     }
 }

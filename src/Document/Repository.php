@@ -24,13 +24,11 @@ class Repository implements ContainerAwareInterface
         $this->files = $files;
     }
 
-    public function findAll()
-    {
-        return $this->map(function ($file) {
-            return new Document($file);
-        });
-    }
-
+    /**
+     * @param string $id
+     *
+     * @return mixed|null
+     */
     public function find($id)
     {
         $file = $this->files->where('id', $id);
@@ -42,6 +40,12 @@ class Repository implements ContainerAwareInterface
         return $file->first();
     }
 
+    /**
+     * @param mixed $name
+     * @param null  $args
+     *
+     * @return \Illuminate\Support\Collection|mixed
+     */
     public function __call($name, $args = null)
     {
         $this->files = call_user_func_array([$this->files, $name], $args);

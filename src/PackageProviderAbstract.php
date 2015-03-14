@@ -3,6 +3,8 @@ namespace Songbird;
 
 use League\Container\ContainerInterface;
 use League\Container\ServiceProvider;
+use League\Route\RouteCollection;
+use Songbird\Event\Event;
 
 abstract class PackageProviderAbstract extends ServiceProvider
 {
@@ -24,8 +26,15 @@ abstract class PackageProviderAbstract extends ServiceProvider
 
     /**
      * @param \League\Container\ContainerInterface $app
+     *
+     * @return mixed
      */
-    protected function registerEventListeners(ContainerInterface $app, $event = null)
+    abstract protected function registerPackage(ContainerInterface $app);
+
+    /**
+     * @param \League\Container\ContainerInterface $app
+     */
+    protected function registerEventListeners(ContainerInterface $app, Event $event)
     {
         // ...
     }
@@ -33,7 +42,7 @@ abstract class PackageProviderAbstract extends ServiceProvider
     /**
      * Add all routes required to handle document requests.
      */
-    protected function registerRoutes($app, $router)
+    protected function registerRoutes(ContainerInterface $app, RouteCollection $router)
     {
         // ...
     }

@@ -2,6 +2,7 @@
 namespace Songbird;
 
 use League\Container\Container;
+use Songbird\Event\EventAwareInterface;
 use Songbird\Event\EventAwareTrait;
 use Symfony\Component\Debug\Debug;
 use Symfony\Component\HttpFoundation\Request;
@@ -9,8 +10,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class App extends Container
 {
-    use EventAwareTrait;
-
     /**
      * Handles a Request to convert it to a Response.
      *
@@ -23,28 +22,18 @@ class App extends Container
         $this->add('Symfony\Component\HttpFoundation\Response', new Response());
         $this->add('Symfony\Component\HttpFoundation\Request', $request);
 
+        $this->get('Event')->emit('AddingRoutes', ['router' => $this->get('Router')]);
+        $this->addRoutes();
+        $this->get('Event')->emit('RoutesAdded', ['router' => $this->get('Router')]);
+
         $dispatcher = $this->get('Router')->getDispatcher();
         $path = rtrim($request->getPathInfo(), '/');
 
-        $this->emit('BeforeDispatch', [$request]);
+        $this->get('Event')->emit('BeforeDispatch', [$request]);
         $response = $dispatcher->dispatch($request->getMethod(), $path ? $path : '/');
-        $this->emit('AfterDispatch', [$request, $response]);
+        $this->get('Event')->emit('AfterDispatch', [$request, $response]);
 
         return $response;
-    }
-
-    /**
-     * This is an alias for get(). I prefer to use this to resolve fully qualified class names, reserving get()
-     * for alias and configuration keys. Mixed style I find to be an eye sore.
-     *
-     * @param string $className
-     * @param array  $args
-     *
-     * @return mixed|object
-     */
-    public function resolve($className, array $args = [])
-    {
-        return $this->get($className, $args);
     }
 
     /**
@@ -61,7 +50,7 @@ class App extends Container
 
         if (is_array($packages)) {
             foreach ($packages as $package) {
-                $this->resolve($package)->register();
+                $this->get($package)->register();
             }
         }
     }
