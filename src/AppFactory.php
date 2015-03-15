@@ -3,6 +3,8 @@ namespace Songbird;
 
 use League\Route\RouteCollection;
 use League\Route\Strategy\RequestResponseStrategy;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
 
 class AppFactory
 {
@@ -25,13 +27,17 @@ class AppFactory
 
         $app->addCoreServiceProviders();
 
-        $app->add('RepositoryFactory', 'Songbird\Document\RepositoryFactory');
-        $app->add('Document.Repository', $app->get('RepositoryFactory')->createDocumentRepository());
-        $app->add('Fragment.Repository', $app->get('RepositoryFactory')->createFragmentRepository());
+        $app->add('RepositoryFactory', 'Songbird\File\RepositoryFactory');
+        $app->add('Repository.Content', $app->get('RepositoryFactory')->createContentRepository());
+        $app->add('Repository.Block', $app->get('RepositoryFactory')->createBlockRepository());
 
         $app->registerPackages();
 
-        $app->inflector('Songbird\Log\LoggerAwareInterface')->invokeMethod('setLogger', [$app->get('Logger')]);
+        $app->singleton('Logger', 'Monolog\Logger')->withArgument('songbird');
+        $app->inflector('Psr\Log\LoggerAwareInterface')->invokeMethod('setLogger', [$app->get('Logger')]);
+
+        $fileName = vsprintf('%s/songbird-%s.log', [$app->config('app.paths.log'), date('Y-d-m')]);
+        $app->get('Logger')->pushHandler(new StreamHandler($fileName, Logger::INFO));
 
         return $app;
     }

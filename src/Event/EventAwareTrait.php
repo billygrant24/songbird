@@ -1,7 +1,7 @@
 <?php
 namespace Songbird\Event;
 
-use League\Event\EmitterTrait;
+
 use League\Event\ListenerAcceptorInterface;
 
 trait EventAwareTrait

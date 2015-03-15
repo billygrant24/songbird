@@ -1,5 +1,5 @@
 <?php
-namespace Songbird\Document;
+namespace Songbird\File;
 
 use Illuminate\Support\Collection as IlluminateCollection;
 

@@ -3,7 +3,6 @@ namespace Songbird\Template;
 
 use League\Container\ContainerAwareInterface;
 use League\Container\ContainerAwareTrait;
-use Songbird\Document\DocumentInterface;
 
 abstract class TemplateAbstract implements ContainerAwareInterface, TemplateInterface
 {
@@ -30,11 +29,11 @@ abstract class TemplateAbstract implements ContainerAwareInterface, TemplateInte
     abstract public function render($content, $data = null);
 
     /**
-     * @param \Songbird\Document\DocumentInterface $document
+     * @param mixed $document
      *
      * @return array
      */
-    protected function parseMeta($document)
+    protected function filterMeta($document)
     {
         $meta = [];
         foreach ($document as $key => $value) {
@@ -88,14 +87,13 @@ abstract class TemplateAbstract implements ContainerAwareInterface, TemplateInte
     public function getData()
     {
         $app = $this->getContainer();
-        $config = $this->getContainer()->get('Config');
 
         $this->getEngine()->addData([
-            'siteTitle' => $config->get('vars.siteTitle'),
-            'baseUrl' => $config->get('vars.baseUrl'),
-            'themeDir' => $config->get('vars.baseUrl') . '/themes/' . $config->get('app.theme'),
-            'dateFormat' => $config->get('vars.dateFormat'),
-            'excerptLength' => $config->get('vars.excerptLength'),
+            'siteTitle' => $app->config('vars.siteTitle'),
+            'baseUrl' => $app->config('vars.baseUrl'),
+            'themeDir' => $app->config('vars.baseUrl') . '/themes/' . $app->config('app.theme'),
+            'dateFormat' => $app->config('vars.dateFormat'),
+            'excerptLength' => $app->config('vars.excerptLength'),
         ]);
 
         return $this->data;

@@ -5,11 +5,6 @@ use League\Container\ServiceProvider;
 use League\Flysystem\Adapter\Local as Adapter;
 use League\Flysystem\Cached\CachedAdapter;
 use League\Flysystem\Cached\Storage\Memory as CacheStore;
-use Songbird\ConfigAwareInterface;
-use Songbird\ConfigAwareTrait;
-use Songbird\Document\Collection;
-use Songbird\Document\Formatter;
-use Songbird\Document\Repository;
 
 class FilesystemServiceProvider extends ServiceProvider
 {

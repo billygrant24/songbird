@@ -1,11 +1,14 @@
 <?php
+namespace Songbird\File;
 
-namespace Songbird\Document;
+use League\Container\ContainerAwareInterface;
+use League\Container\ContainerAwareTrait;
+use Symfony\Component\Yaml\Parser as Yaml;
 
-use Symfony\Component\Yaml\Parser;
-
-class Formatter
+class Parser implements ContainerAwareInterface
 {
+    use ContainerAwareTrait;
+
     /**
      * @var string
      */
@@ -28,7 +31,7 @@ class Formatter
     {
         $parts = preg_split('/[\n]*[-]{3}[\n]/', $data, 3);
 
-        $parser = new Parser;
+        $parser = new Yaml;
 
         $yaml = $parser->parse($parts[1]);
         $yaml[$this->contentFieldName] = $parts[2];

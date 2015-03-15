@@ -6,8 +6,8 @@ use League\Container\ContainerAwareTrait;
 use League\Container\Exception\ReflectionException;
 use Songbird\Event\EventAwareInterface;
 use Songbird\Event\EventAwareTrait;
-use Songbird\Log\LoggerAwareInterface;
-use Songbird\Log\LoggerAwareTrait;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -35,7 +35,7 @@ class Controller implements ContainerAwareInterface, LoggerAwareInterface, Event
         // We can assume that if the method is GET we want to set content body.
         if ($request->isMethod('get')) {
             try {
-                $content = $this->resolve('Template')->render($document['_template'], $document);
+                $content = $this->resolve('Template')->render($document['template'], $document);
             } catch (ReflectionException $e) {
                 $content = $document['body'];
             }
@@ -53,7 +53,7 @@ class Controller implements ContainerAwareInterface, LoggerAwareInterface, Event
      */
     protected function getDocument($documentId)
     {
-        return $this->resolve('Document.Repository')->find($documentId ? $documentId : 'home');
+        return $this->resolve('Repository.Content')->find($documentId ? $documentId : 'home');
     }
 
     /**
@@ -61,26 +61,15 @@ class Controller implements ContainerAwareInterface, LoggerAwareInterface, Event
      *
      * @param \Symfony\Component\HttpFoundation\Request  $request
      * @param \Symfony\Component\HttpFoundation\Response $response
-     * @param \Songbird\Document\DocumentInterface       $document
+     * @param mixed                                      $document
      */
     protected function handleListeners(Request $request, Response $response, $document)
     {
-        $verb = strtolower($request->getMethod());
-
-        if (isset($document['_listen'][$verb])) {
-            $listeners = $document['_listen'][$verb];
+        if (!isset($document['listen'])) {
+            return;
         }
 
-        if (isset($document['_listen']['all'])) {
-            $listeners = $document['_listen']['all'];
-        } else {
-            $listeners = [];
-        }
-
-        if (!is_array($listeners)) {
-            $listeners = [$listeners];
-        }
-
+        $listeners = is_array($document['listen']) ? $document['listen'] : [$document['listen']];
         foreach ($listeners as $listener) {
             $this->addListener($listener,
                 $this->resolve($listener, [$request, $response]));

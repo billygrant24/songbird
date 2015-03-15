@@ -33,6 +33,7 @@ abstract class PackageProviderAbstract extends ServiceProvider
 
     /**
      * @param \League\Container\ContainerInterface $app
+     * @param \Songbird\Event\Event                $event
      */
     protected function registerEventListeners(ContainerInterface $app, Event $event)
     {
@@ -41,6 +42,9 @@ abstract class PackageProviderAbstract extends ServiceProvider
 
     /**
      * Add all routes required to handle document requests.
+     *
+     * @param \League\Container\ContainerInterface $app
+     * @param \League\Route\RouteCollection        $router
      */
     protected function registerRoutes(ContainerInterface $app, RouteCollection $router)
     {

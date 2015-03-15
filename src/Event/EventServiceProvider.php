@@ -2,8 +2,6 @@
 namespace Songbird\Event;
 
 use League\Container\ServiceProvider;
-use Songbird\ConfigAwareInterface;
-use Songbird\ConfigAwareTrait;
 
 class EventServiceProvider extends ServiceProvider
 {

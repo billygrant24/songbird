@@ -2,8 +2,8 @@
 namespace Songbird\Listener;
 
 use League\Event\EventInterface;
-use Songbird\Log\LoggerAwareInterface;
-use Songbird\Log\LoggerAwareTrait;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 
 class PageNotFound extends HttpEventListenerAbstract implements LoggerAwareInterface
 {
@@ -18,7 +18,7 @@ class PageNotFound extends HttpEventListenerAbstract implements LoggerAwareInter
     {
         $this->response->setStatusCode(404);
 
-        $this->getLogger()->addError(sprintf('Page "%s" could not be found.', $this->request->getPathInfo()));
+        $this->logger->addError(sprintf('Page "%s" could not be found.', $this->request->getPathInfo()));
 
         $event->stopPropagation();
     }

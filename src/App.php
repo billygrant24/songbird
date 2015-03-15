@@ -2,8 +2,8 @@
 namespace Songbird;
 
 use League\Container\Container;
-use Songbird\Event\EventAwareInterface;
-use Songbird\Event\EventAwareTrait;
+
+
 use Symfony\Component\Debug\Debug;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -41,7 +41,7 @@ class App extends Container
      */
     public function startDebugging()
     {
-        return Debug::enable();
+        Debug::enable();
     }
 
     public function registerPackages()
@@ -59,7 +59,6 @@ class App extends Container
     {
         $this->addServiceProvider('Songbird\Event\EventServiceProvider');
         $this->addServiceProvider('Songbird\Filesystem\FilesystemServiceProvider');
-        $this->addServiceProvider('Songbird\Log\LoggerServiceProvider');
     }
 
     /**
