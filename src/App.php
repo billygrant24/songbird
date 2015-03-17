@@ -74,7 +74,7 @@ class App extends Container
         foreach (['GET', 'POST', 'PUT', 'DELETE'] as $method) {
             $this->get('Router')->addRoute(
                 $method,
-                '/{documentId:.*}',
+                '/{documentId:[a-zA-Z0-9_\-\/]*}',
                 sprintf('%s::handle', $this->config('app.handler', 'Songbird\Controller'))
             );
         }

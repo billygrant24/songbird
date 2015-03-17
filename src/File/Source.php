@@ -199,7 +199,7 @@ class Source
                 $this->getFilesystem()->read($this->generateFullPathToFile($includePath))
             );
 
-            $newFile[$key] = $includedFile;
+            $newFile['includes'][$key] = $includedFile;
         }
 
         return $newFile;
