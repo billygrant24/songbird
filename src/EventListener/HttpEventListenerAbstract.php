@@ -1,5 +1,5 @@
 <?php
-namespace Songbird\Listener;
+namespace Songbird\EventListener;
 
 use League\Event\AbstractListener;
 use League\Event\EventInterface;

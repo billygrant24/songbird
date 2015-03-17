@@ -29,7 +29,10 @@ abstract class PackageProviderAbstract extends ServiceProvider
      *
      * @return mixed
      */
-    abstract protected function registerPackage(ContainerInterface $app);
+    protected function registerPackage(ContainerInterface $app)
+    {
+        // ...
+    }
 
     /**
      * @param \League\Container\ContainerInterface $app

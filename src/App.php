@@ -55,12 +55,6 @@ class App extends Container
         }
     }
 
-    public function addCoreServiceProviders()
-    {
-        $this->addServiceProvider('Songbird\Event\EventServiceProvider');
-        $this->addServiceProvider('Songbird\Filesystem\FilesystemServiceProvider');
-    }
-
     /**
      * @param string     $key
      * @param mixed|null $defaultValue

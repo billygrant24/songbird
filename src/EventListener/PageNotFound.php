@@ -1,5 +1,5 @@
 <?php
-namespace Songbird\Listener;
+namespace Songbird\EventListener;
 
 use League\Event\EventInterface;
 use Psr\Log\LoggerAwareInterface;
