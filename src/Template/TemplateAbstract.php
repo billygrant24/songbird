@@ -94,6 +94,7 @@ abstract class TemplateAbstract implements ContainerAwareInterface, TemplateInte
             'themeDir' => $app->config('vars.baseUrl') . '/themes/' . $app->config('app.theme'),
             'dateFormat' => $app->config('vars.dateFormat'),
             'excerptLength' => $app->config('vars.excerptLength'),
+            'repository' => $app->get('Repository'),
         ]);
 
         return $this->data;

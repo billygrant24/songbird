@@ -2,38 +2,35 @@
 namespace Songbird;
 
 use League\Container\Container;
-
-
+use Songbird\Event\DispatchEvent;
+use Songbird\Event\RouterEvent;
+use Songbird\EventListener\RouterListener;
 use Symfony\Component\Debug\Debug;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 class App extends Container
 {
     /**
      * Handles a Request to convert it to a Response.
      *
-     * @param \Symfony\Component\HttpFoundation\Request $request A Request instance
-     *
      * @return \Symfony\Component\HttpFoundation\Response A Response instance
      */
-    public function run(Request $request)
+    public function run()
     {
-        $this->add('Symfony\Component\HttpFoundation\Response', new Response());
-        $this->add('Symfony\Component\HttpFoundation\Request', $request);
+        $this->registerPackages();
 
-        $this->get('Event')->emit('AddingRoutes', ['router' => $this->get('Router')]);
-        $this->addRoutes();
-        $this->get('Event')->emit('RoutesAdded', ['router' => $this->get('Router')]);
+        $emitter = $this->get('Emitter');
+        $emitter->addListener('RouterEvent', new RouterListener());
 
-        $dispatcher = $this->get('Router')->getDispatcher();
-        $path = rtrim($request->getPathInfo(), '/');
+        $router = $emitter->emit(new RouterEvent(
+            $this->get('Router'),
+            $this->get('Symfony\Component\HttpFoundation\Request')
+        ))->getModifiedRouter();
 
-        $this->get('Event')->emit('BeforeDispatch', [$request]);
-        $response = $dispatcher->dispatch($request->getMethod(), $path ? $path : '/');
-        $this->get('Event')->emit('AfterDispatch', [$request, $response]);
-
-        return $response;
+        return $emitter->emit(new DispatchEvent(
+            $router->getDispatcher(),
+            $this->get('Symfony\Component\HttpFoundation\Request'),
+            $this->get('Symfony\Component\HttpFoundation\Response')
+        ))->getModifiedResponse();
     }
 
     /**
@@ -41,7 +38,9 @@ class App extends Container
      */
     public function startDebugging()
     {
-        Debug::enable();
+        if ($this->config('app.debug')) {
+            Debug::enable();
+        }
     }
 
     public function registerPackages()
@@ -64,19 +63,5 @@ class App extends Container
     public function config($key, $defaultValue = null)
     {
         return $this->get('Config')->get($key, $defaultValue);
-    }
-
-    /**
-     * Add all routes required to handle document requests.
-     */
-    public function addRoutes()
-    {
-        foreach (['GET', 'POST', 'PUT', 'DELETE'] as $method) {
-            $this->get('Router')->addRoute(
-                $method,
-                '/{documentId:[a-zA-Z0-9_\-\/]*}',
-                sprintf('%s::handle', $this->config('app.handler', 'Songbird\Controller'))
-            );
-        }
     }
 }

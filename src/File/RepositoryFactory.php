@@ -14,15 +14,7 @@ class RepositoryFactory implements ContainerAwareInterface
      */
     public function createContentRepository()
     {
-        return $this->createRepositoryForDirectory('content');
-    }
-
-    /**
-     * @return \Songbird\File\Repository
-     */
-    public function createBlockRepository()
-    {
-        return $this->createRepositoryForDirectory('blocks');
+        return $this->createRepositoryForDirectory('/');
     }
 
     /**
@@ -34,15 +26,14 @@ class RepositoryFactory implements ContainerAwareInterface
     public function createRepositoryForDirectory($directory, $extension = 'md')
     {
         $source = $this->resolve('Songbird\File\Source');
-        $repo = $this->resolve('Songbird\File\Repository');
+        $repository = $this->resolve('Songbird\File\Repository');
 
+        $source->setFilesystem($this->resolve('Filesystem'));
         $source->setDirectory($directory);
         $source->setExtension($extension);
-        $source->setParser($this->resolve('Songbird\File\Parser'));
-        $source->setFilesystem($this->resolve('Filesystem'));
 
-        $repo->addSource($source);
+        $repository->addDataSource($source);
 
-        return $repo;
+        return $repository;
     }
 }

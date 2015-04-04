@@ -4,16 +4,17 @@ namespace Songbird;
 use League\Container\ContainerAwareInterface;
 use League\Container\ContainerAwareTrait;
 use League\Container\Exception\ReflectionException;
-use Songbird\Event\EventAwareInterface;
-use Songbird\Event\EventAwareTrait;
+use League\Event\EmitterAwareInterface;
+use League\Event\EmitterTrait;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
+use Songbird\Event\ContentEvent;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class Controller implements ContainerAwareInterface, LoggerAwareInterface, EventAwareInterface
+class Handler implements ContainerAwareInterface, LoggerAwareInterface, EmitterAwareInterface
 {
-    use ContainerAwareTrait, ContainerResolverTrait, LoggerAwareTrait, EventAwareTrait;
+    use ContainerAwareTrait, ContainerResolverTrait, LoggerAwareTrait, EmitterTrait;
 
     /**
      * @param \Symfony\Component\HttpFoundation\Request  $request
@@ -23,41 +24,41 @@ class Controller implements ContainerAwareInterface, LoggerAwareInterface, Event
      * @return mixed
      *
      */
-    public function handle(Request $request, Response $response, array $args)
+    public function __invoke(Request $request, Response $response, array $args)
     {
-        $document = $this->getDocument($args['documentId']);
+        $content = $this->getFileContent($args['fileId']);
 
-        $this->emit('PrepareDocument', ['document' => &$document]);
-
-        // Fire any events for the current document.
-        $this->handleListeners($request, $response, $document);
+        // Fire any events for the current file.
+        $this->handleListeners($request, $response, $content);
 
         // We can assume that if the method is GET we want to set content body.
         if ($request->isMethod('get')) {
             try {
-                $content = $this->resolve('Template')->render($document['template'], $document);
+                $finalContent = $this->resolve('Template')->render($content['template'], $content);
             } catch (ReflectionException $e) {
-                $content = $document['body'];
+                $finalContent = $content['body'];
             }
 
-            $response->setContent($content);
+            $response->setContent($finalContent);
         }
 
         return $response;
     }
 
     /**
-     * @param string $documentId
+     * @param string $fileId
      *
      * @return mixed
      */
-    protected function getDocument($documentId)
+    protected function getFileContent($fileId)
     {
-        return $this->resolve('Repository.Content')->find($documentId ? $documentId : 'home');
+        $content = $this->resolve('Repository')->find($fileId ? $fileId : 'home');
+
+        return $this->emit(new ContentEvent($content))->getModifiedContent();
     }
 
     /**
-     * Register any listeners discovered for the current page and add them to the Event Emitter.
+     * Register any listeners discovered for the current page and add them to the Emitter Emitter.
      *
      * @param \Symfony\Component\HttpFoundation\Request  $request
      * @param \Symfony\Component\HttpFoundation\Response $response

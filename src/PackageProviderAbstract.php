@@ -4,7 +4,7 @@ namespace Songbird;
 use League\Container\ContainerInterface;
 use League\Container\ServiceProvider;
 use League\Route\RouteCollection;
-use Songbird\Event\Event;
+use League\Event\Emitter;
 
 abstract class PackageProviderAbstract extends ServiceProvider
 {
@@ -20,8 +20,8 @@ abstract class PackageProviderAbstract extends ServiceProvider
         $app = $this->getContainer();
 
         $this->registerPackage($app);
-        $this->registerEventListeners($app, $app->get('Event'));
-        $this->registerRoutes($app, $app->get('Router'));
+        $this->registerEventListeners($app->get('Emitter'));
+        $this->registerRoutes($app->get('Router'));
     }
 
     /**
@@ -35,10 +35,9 @@ abstract class PackageProviderAbstract extends ServiceProvider
     }
 
     /**
-     * @param \League\Container\ContainerInterface $app
-     * @param \Songbird\Event\Event                $event
+     * @param \League\Event\Emitter $event
      */
-    protected function registerEventListeners(ContainerInterface $app, Event $event)
+    protected function registerEventListeners(Emitter $event)
     {
         // ...
     }
@@ -46,10 +45,9 @@ abstract class PackageProviderAbstract extends ServiceProvider
     /**
      * Add all routes required to handle document requests.
      *
-     * @param \League\Container\ContainerInterface $app
-     * @param \League\Route\RouteCollection        $router
+     * @param \League\Route\RouteCollection $router
      */
-    protected function registerRoutes(ContainerInterface $app, RouteCollection $router)
+    protected function registerRoutes(RouteCollection $router)
     {
         // ...
     }

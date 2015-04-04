@@ -1,6 +1,7 @@
 <?php
 namespace Songbird;
 
+use josegonzalez\Dotenv\Loader;
 use Noodlehaus\Config as NoodleConfig;
 
 class Config extends NoodleConfig
@@ -14,7 +15,7 @@ class Config extends NoodleConfig
 
     public function loadEnvironment()
     {
-        $env = new Environment(getcwd() . '/../.env');
+        $env = new Loader(getcwd() . '/../.env');
 
         return $env->parse()->prefix('APP_')->define();
     }

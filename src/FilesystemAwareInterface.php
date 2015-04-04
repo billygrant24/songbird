@@ -1,5 +1,5 @@
 <?php
-namespace Songbird\Filesystem;
+namespace Songbird;
 
 use League\Flysystem\Filesystem;
 

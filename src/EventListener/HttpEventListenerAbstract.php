@@ -41,10 +41,7 @@ abstract class HttpEventListenerAbstract extends AbstractListener implements Lis
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function handle(EventInterface $event)
-    {
-        // ...
-    }
+    abstract public function handle(EventInterface $event);
 
     /**
      * @return array

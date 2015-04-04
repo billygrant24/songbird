@@ -6,6 +6,8 @@ use League\Flysystem\Cached\CachedAdapter;
 use League\Flysystem\Cached\Storage\Memory as CacheStore;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class AppFactory
 {
@@ -16,29 +18,25 @@ class AppFactory
      */
     public static function createApplication($config = '')
     {
-        $app = new App(require __DIR__ . '/Resources/etc/di.php');
+        $app = new App(require __DIR__ . '/../config/di.php');
 
-        $app->add('App', $app);
         $app->add('Config', new Config($config));
-
-        $app->inflector('League\Container\ContainerAwareInterface')->invokeMethod('setContainer', [$app->get('App')]);
-        $app->inflector('Songbird\Event\EventAwareInterface')->invokeMethod('setEvent', [$app->get('Event')]);
-
-        $app->add('Filesystem', 'Songbird\Filesystem\Filesystem')->withArgument(
+        $app->add('Symfony\Component\HttpFoundation\Response', new Response());
+        $app->add('Symfony\Component\HttpFoundation\Request', Request::createFromGlobals());
+        $app->add('Filesystem', 'League\Flysystem\Filesystem')->withArgument(
             new CachedAdapter(new Adapter($app->config('app.paths.resources')), new CacheStore())
         );
+        $app->get('Logger')->pushHandler(new StreamHandler(vsprintf('%s/songbird-%s.log', [
+            $app->config('app.paths.log'),
+            date('Y-d-m')
+        ]), Logger::INFO));
 
-        $app->inflector('Songbird\Filesystem\FilesystemAwareInterface')->invokeMethod('setFilesystem', ['Filesystem']);
-
-        $app->add('Repository.Content', $app->get('RepositoryFactory')->createContentRepository());
-        $app->add('Repository.Block', $app->get('RepositoryFactory')->createBlockRepository());
-
-        $app->registerPackages();
-
+        $app->inflector('League\Container\ContainerAwareInterface')->invokeMethod('setContainer', [$app]);
+        $app->inflector('League\Event\EmitterAwareInterface')->invokeMethod('setEmitter', [$app->get('Emitter')]);
         $app->inflector('Psr\Log\LoggerAwareInterface')->invokeMethod('setLogger', [$app->get('Logger')]);
+        $app->inflector('Songbird\FilesystemAwareInterface')->invokeMethod('setFilesystem', ['Filesystem']);
 
-        $fileName = vsprintf('%s/songbird-%s.log', [$app->config('app.paths.log'), date('Y-d-m')]);
-        $app->get('Logger')->pushHandler(new StreamHandler($fileName, Logger::INFO));
+        $app->add('Repository', $app->get('RepositoryFactory')->createContentRepository());
 
         return $app;
     }

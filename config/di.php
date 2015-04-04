@@ -23,9 +23,9 @@ return [
                 'songbird',
             ],
         ],
-        'Event' => [
+        'Emitter' => [
             'singleton' => true,
-            'class' => 'Songbird\Event\Event',
+            'class' => 'League\Event\Emitter',
         ],
         'RepositoryFactory' => [
             'class' => 'Songbird\File\RepositoryFactory',

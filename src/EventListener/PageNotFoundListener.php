@@ -5,7 +5,7 @@ use League\Event\EventInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 
-class PageNotFound extends HttpEventListenerAbstract implements LoggerAwareInterface
+class PageNotFoundListener extends HttpEventListenerAbstract implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 

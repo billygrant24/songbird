@@ -1,6 +1,9 @@
 <?php
 namespace Songbird\File;
 
+use Illuminate\Support\Collection;
+use Symfony\Component\Yaml\Yaml;
+
 class Source
 {
     /**
@@ -14,14 +17,9 @@ class Source
     protected $extension;
 
     /**
-     * @var \Songbird\Filesystem\Filesystem
+     * @var \Songbird\Filesystem
      */
     protected $filesystem;
-
-    /**
-     * @var \Songbird\File\Parser
-     */
-    protected $parser;
 
     /**
      * Hydrate the repository with files.
@@ -32,13 +30,44 @@ class Source
 
         return $files->map(function ($file) {
             if ($this->shouldBeParsed($file)) {
-                return $this->parseFile($file);
+                $arr['id'] = $this->generateIdForFile($file['path']);
+                $arr = array_merge($arr, $this->parse($this->getFilesystem()->read($file['path'])));
+
+                if ($this->hasParent($arr)) {
+                    $arr = array_merge($this->parseParent($arr), $arr);
+                }
+
+                if ($this->hasIncludes($arr)) {
+                    $arr = array_merge($arr, $this->parseIncludes($arr));
+                }
+
+                return $arr;
             }
         });
     }
 
     /**
-     * @return \Songbird\Filesystem\Filesystem
+     * @param mixed $data
+     *
+     * @return mixed
+     */
+    public function parse($data)
+    {
+        $parts = preg_split('/[\n]*[-]{3}[\n]/', $data, 3);
+
+        $parser = new Yaml();
+
+        $yaml = $parser->parse($parts[1]);
+
+        if (trim($parts[2]) !== '...') {
+            $yaml['body'] = $parts[2];
+        }
+
+        return $yaml;
+    }
+
+    /**
+     * @return \Songbird\Filesystem
      */
     public function getFilesystem()
     {
@@ -46,7 +75,7 @@ class Source
     }
 
     /**
-     * @param \Songbird\Filesystem\Filesystem $filesystem
+     * @param \Songbird\Filesystem $filesystem
      */
     public function setFilesystem($filesystem)
     {
@@ -96,27 +125,6 @@ class Source
     }
 
     /**
-     * @param mixed $file
-     *
-     * @return array
-     */
-    protected function parseFile($file)
-    {
-        $arr['id'] = $this->generateIdForFile($file['path']);
-        $arr = array_merge($arr, $this->getParser()->decode($this->getFilesystem()->read($file['path'])));
-
-        if ($this->hasParent($arr)) {
-            $arr = array_merge($this->parseParent($arr), $arr);
-        }
-
-        if ($this->hasIncludes($arr)) {
-            $arr = array_merge($arr, $this->parseIncludes($arr));
-        }
-
-        return $arr;
-    }
-
-    /**
      * @param mixed $path
      *
      * @return mixed
@@ -124,22 +132,6 @@ class Source
     protected function generateIdForFile($path)
     {
         return str_replace([$this->getDirectory() . '/', '.' . $this->getExtension()], '', $path);
-    }
-
-    /**
-     * @return \Songbird\File\Parser
-     */
-    public function getParser()
-    {
-        return $this->parser;
-    }
-
-    /**
-     * @param \Songbird\File\Parser $parser
-     */
-    public function setParser($parser)
-    {
-        $this->parser = $parser;
     }
 
     /**
@@ -161,7 +153,7 @@ class Source
     {
         $parentPath = $file['extends'];
 
-        return $this->getParser()->decode(
+        return $this->parse(
             $this->getFilesystem()->read($this->generateFullPathToFile($parentPath))
         );
     }
@@ -195,7 +187,7 @@ class Source
     {
         $newFile = [];
         foreach ($file['includes'] as $key => $includePath) {
-            $includedFile = $this->getParser()->decode(
+            $includedFile = $this->parse(
                 $this->getFilesystem()->read($this->generateFullPathToFile($includePath))
             );
 
